@@ -7,6 +7,7 @@ export interface JournalEntryType {
   text: string;
   mood: string;
   timestamp: Date | string | FirestoreTimestampLike;
+  sketch?: string | null;
 }
 
 export interface SleepEntryType {

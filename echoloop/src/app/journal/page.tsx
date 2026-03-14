@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import JournalDrawingCanvas from "@/components/JournalDrawingCanvas";
-// import { collection, addDoc } from "firebase/firestore";
-// import { db } from "@/lib/firebase";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 const JournalPage = () => {
   const [entry, setEntry] = useState("");
@@ -20,24 +20,35 @@ const JournalPage = () => {
   };
 
   const handleSaveEntry = async () => {
+    // Prevent saving if both text and sketch are empty
     if (entry.trim() === "" && !canvasData) {
       return;
     }
 
-    // Firestore save is disabled until the Firebase project is configured.
-    // await addDoc(collection(db, "journalEntries"), {
-    //   text: entry,
-    //   sketch: canvasData,
-    //   timestamp: new Date(),
-    // });
+    try {
+      // 1. Save directly to Firestore
+      await addDoc(collection(db, "journalEntries"), {
+        text: entry,
+        sketch: canvasData || null, // Safely handle empty sketches
+        mood: "neutral", // Added to satisfy your JournalEntryType requirements
+        timestamp: new Date().toISOString(), // Standardized time format
+      });
 
-    setSavedPreview({
-      text: entry,
-      hasSketch: !!canvasData,
-    });
-    setEntry("");
-    setCanvasData(null);
-    setCanvasResetToken((prev) => prev + 1);
+      // 2. Update the local UI preview
+      setSavedPreview({
+        text: entry,
+        hasSketch: !!canvasData,
+      });
+
+      // 3. Reset the form
+      setEntry("");
+      setCanvasData(null);
+      setCanvasResetToken((prev) => prev + 1);
+      
+    } catch (error) {
+      console.error("Error saving journal reflection to Firebase:", error);
+      // If you have a toast notification system, you could trigger an error message here!
+    }
   };
 
   return (
