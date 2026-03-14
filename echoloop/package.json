@@ -10,11 +10,13 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "firebase": "latest",
     "framer-motion": "latest",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
+    "react-markdown": "^10.1.0",
     "recharts": "^3.8.0"
   },
   "devDependencies": {

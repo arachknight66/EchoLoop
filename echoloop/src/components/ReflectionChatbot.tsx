@@ -1,107 +1,162 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
+import ReactMarkdown from "react-markdown";
 
 type Message = {
-  id: string;
-  text: string;
-  sender: "user" | "bot";
+  role: "user" | "model";
+  parts: [{ text: string }];
 };
 
-const initialMessages: Message[] = [
-  {
-    id: "1",
-    text: "What's on your mind today?",
-    sender: "bot",
-  },
-];
-
-const botResponses = [
-  "That's interesting. Tell me more.",
-  "I see. How did that make you feel?",
-  "Keep exploring those thoughts.",
-  "Your reflection shows growth.",
-  "What else is present for you?",
-  "That's a meaningful observation.",
-];
-
 export default function ReflectionChatbot() {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      role: "model",
+      parts: [{ text: "Hi there. I'm here to listen. How are you feeling right now?" }],
+    },
+  ]);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const handleSendMessage = () => {
-    if (input.trim() === "") return;
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
-    // Add user message
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: input,
-      sender: "user",
-    };
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
+  const handleSendMessage = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!input.trim() || isLoading) return;
 
-    // Simulate bot response
-    setTimeout(() => {
-      const randomResponse =
-        botResponses[Math.floor(Math.random() * botResponses.length)];
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: randomResponse,
-        sender: "bot",
-      };
-      setMessages((prev) => [...prev, botMessage]);
-    }, 500);
+    const userMessage = input.trim();
+    setInput(""); 
+    setIsLoading(true);
+
+    const newMessages: Message[] = [
+      ...messages,
+      { role: "user", parts: [{ text: userMessage }] },
+    ];
+    setMessages(newMessages);
+
+    try {
+      const safeHistory = messages
+        .filter((msg, index) => {
+          if (index === 0 && msg.role === "model") return false;
+          return true;
+        })
+        .map(msg => ({
+          role: msg.role,
+          parts: msg.parts,
+        }));
+
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: userMessage,
+          history: safeHistory,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Network response was not ok");
+      
+      const data = await response.json();
+
+      setMessages((prev) => [
+        ...prev,
+        { role: "model", parts: [{ text: data.text }] },
+      ]);
+    } catch (error) {
+      console.error("Chat error:", error);
+      setMessages((prev) => [
+        ...prev,
+        { role: "model", parts: [{ text: "I'm sorry, I'm having trouble connecting right now. Please take a deep breath and try again in a moment." }] },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <motion.div
-      className="chatbot-card sidebar-card"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: 0.2 }}
-    >
-      <h3 className="sidebar-card__title">Reflection Companion</h3>
-      
-      <div className="chatbot-messages">
-        {messages.map((message, idx) => (
-          <motion.div
-            key={message.id}
-            className={`chatbot-message ${message.sender}`}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.1 }}
-          >
-            <p className="message-text">{message.text}</p>
-          </motion.div>
-        ))}
+    <div className="panel-card flex flex-col h-[500px]">
+      <div className="border-b border-gray-100 pb-3 mb-4">
+        <h2 className="text-xl font-semibold">Reflection Guide</h2>
+        <p className="text-sm text-gray-500">A safe space to untangle your thoughts.</p>
       </div>
 
-      <div className="chatbot-input-group">
+      {/* Chat History Window */}
+      <div className="flex-grow overflow-y-auto pr-2 mb-4 space-y-4">
+        {messages.map((msg, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+          >
+            <div
+              className={`max-w-[85%] text-sm ${
+                msg.role === "user"
+                  ? "p-3.5 bg-blue-500 text-white rounded-2xl rounded-br-none shadow-sm"
+                  : "text-gray-800" // Removed the borders, background, and padding for Gemini
+              }`}
+            >
+              <ReactMarkdown 
+                components={{
+                  p: ({ node, ...props }) => <p className="mb-2 last:mb-0 leading-relaxed" {...props} />,
+                  ul: ({ node, ...props }) => <ul className="list-disc ml-5 mb-2 space-y-1" {...props} />,
+                  strong: ({ node, ...props }) => <strong className="font-semibold text-current" {...props} />,
+                }}
+              >
+                {msg.parts[0].text}
+              </ReactMarkdown>
+            </div>
+          </motion.div>
+        ))}
+        
+        {/* Loading Indicator */}
+        {isLoading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex justify-start"
+          >
+            {/* Kept the loading indicator styled so the user knows it's "typing" */}
+            <div className="text-gray-500 text-sm flex space-x-1">
+              <span className="animate-bounce">.</span>
+              <span className="animate-bounce delay-100">.</span>
+              <span className="animate-bounce delay-200">.</span>
+            </div>
+          </motion.div>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Input Area */}
+      {/* Increased gap from gap-4 to gap-20 (5x) */}
+      <form onSubmit={handleSendMessage} className="mt-auto flex gap-20 items-center pt-2">
         <input
           type="text"
-          className="chatbot-input"
-          placeholder="Share your thoughts..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyPress={(e) => {
-            if (e.key === "Enter") {
-              handleSendMessage();
-            }
-          }}
+          placeholder="Type your reflection here..."
+          // Added h-8, text-xs, and reduced padding to make it ~30% smaller
+          className="flex-grow py-1.5 px-3 h-8 text-xs border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400/50 bg-white text-gray-800 shadow-sm transition-all"
+          disabled={isLoading}
         />
-        <motion.button
-          className="chatbot-send-btn"
-          onClick={handleSendMessage}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          disabled={input.trim() === ""}
+        <button
+          type="submit"
+          disabled={!input.trim() || isLoading}
+          // Added h-8, text-xs, and flex to ensure horizontal alignment with the input
+          className="panel-button px-4 py-1.5 h-8 text-xs rounded-full disabled:opacity-50 shadow-sm transition-all flex items-center justify-center"
         >
-          ↓
-        </motion.button>
-      </div>
-    </motion.div>
+          Send
+        </button>
+      </form>
+    </div>
   );
 }
