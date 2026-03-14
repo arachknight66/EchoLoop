@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import JournalDrawingCanvas from "@/components/JournalDrawingCanvas";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { analyzeJournal } from "@/lib/api";
 
 const JournalPage = () => {
   const [entry, setEntry] = useState("");
@@ -14,6 +15,10 @@ const JournalPage = () => {
     text: string;
     hasSketch: boolean;
   } | null>(null);
+  const [summary, setSummary] = useState<string | null>(null);
+  const [emotions, setEmotions] = useState<string[] | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
 
   const handleCanvasDataChange = (data: string | null) => {
     setCanvasData(data);
@@ -29,9 +34,9 @@ const JournalPage = () => {
       // 1. Save directly to Firestore
       await addDoc(collection(db, "journalEntries"), {
         text: entry,
-        sketch: canvasData || null, // Safely handle empty sketches
-        mood: "neutral", // Added to satisfy your JournalEntryType requirements
-        timestamp: new Date().toISOString(), // Standardized time format
+        sketch: canvasData || null,
+        mood: "neutral",
+        timestamp: new Date().toISOString(),
       });
 
       // 2. Update the local UI preview
@@ -40,14 +45,31 @@ const JournalPage = () => {
         hasSketch: !!canvasData,
       });
 
-      // 3. Reset the form
+      // 3. Analyze the journal entry if text is present
+      if (entry.trim() !== "") {
+        setIsAnalyzing(true);
+        setAnalysisError(null);
+        try {
+          const result = await analyzeJournal(entry);
+          setSummary(result.summary || null);
+          setEmotions(result.emotions || null);
+        } catch (error) {
+          console.error("Error analyzing journal:", error);
+          setAnalysisError(
+            error instanceof Error ? error.message : "Failed to analyze journal"
+          );
+        } finally {
+          setIsAnalyzing(false);
+        }
+      }
+
+      // 4. Reset the form
       setEntry("");
       setCanvasData(null);
       setCanvasResetToken((prev) => prev + 1);
       
     } catch (error) {
       console.error("Error saving journal reflection to Firebase:", error);
-      // If you have a toast notification system, you could trigger an error message here!
     }
   };
 
@@ -130,6 +152,45 @@ const JournalPage = () => {
           )}
           {savedPreview.hasSketch && (
             <p className="preview-sketch">✓ Sketch included</p>
+          )}
+
+          {isAnalyzing && (
+            <div className="analysis-loading">
+              <p>Analyzing your reflection...</p>
+            </div>
+          )}
+
+          {analysisError && (
+            <div className="analysis-error">
+              <p>Could not analyze reflection: {analysisError}</p>
+            </div>
+          )}
+
+          {summary && !isAnalyzing && (
+            <motion.div
+              className="analysis-results"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <div className="analysis-section">
+                <p className="analysis-label">Summary</p>
+                <p className="analysis-content">{summary}</p>
+              </div>
+
+              {emotions && emotions.length > 0 && (
+                <div className="analysis-section">
+                  <p className="analysis-label">Detected Emotions</p>
+                  <div className="emotions-list">
+                    {emotions.map((emotion, idx) => (
+                      <span key={idx} className="emotion-tag">
+                        {emotion}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </motion.div>
           )}
         </motion.div>
       ) : null}
