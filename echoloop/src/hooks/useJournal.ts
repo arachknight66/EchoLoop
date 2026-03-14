@@ -1,30 +1,61 @@
-import { useEffect, useState } from 'react';
-import { db } from '../lib/firebase';
-import { collection, addDoc, getDocs } from 'firebase/firestore';
-import { JournalEntryType } from '../lib/types';
+"use client";
 
-const useJournal = () => {
+import { useEffect, useState } from "react";
+import { collection, addDoc, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import type { JournalEntryType } from "@/lib/types";
+
+export const useJournal = () => {
   const [entries, setEntries] = useState<JournalEntryType[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
 
   const fetchEntries = async () => {
     setLoading(true);
-    const querySnapshot = await getDocs(collection(db, 'journalEntries'));
-    const fetchedEntries: JournalEntryType[] = [];
-    querySnapshot.forEach((doc) => {
-      fetchedEntries.push({ id: doc.id, ...doc.data() } as JournalEntryType);
-    });
-    setEntries(fetchedEntries);
-    setLoading(false);
+
+    try {
+      const querySnapshot = await getDocs(collection(db, "journalEntries"));
+      const fetchedEntries = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<JournalEntryType, "id">),
+      }));
+
+      setEntries(fetchedEntries);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const saveEntry = async (entry: JournalEntryType) => {
-    await addDoc(collection(db, 'journalEntries'), entry);
-    fetchEntries(); // Refresh entries after saving
+    await addDoc(collection(db, "journalEntries"), entry);
+    await fetchEntries();
   };
 
   useEffect(() => {
-    fetchEntries();
+    let cancelled = false;
+
+    const loadEntries = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "journalEntries"));
+        const fetchedEntries = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...(doc.data() as Omit<JournalEntryType, "id">),
+        }));
+
+        if (!cancelled) {
+          setEntries(fetchedEntries);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void loadEntries();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return { entries, saveEntry, loading };

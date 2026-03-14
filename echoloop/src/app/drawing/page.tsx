@@ -1,25 +1,28 @@
-import React, { useState } from 'react';
-import DrawingCanvas from '../../components/DrawingCanvas';
+"use client";
 
-const DrawingPage = () => {
-    const [isDrawing, setIsDrawing] = useState(true);
+import { useState } from "react";
+import DrawingCanvas from "@/components/DrawingCanvas";
 
-    const toggleMode = () => {
-        setIsDrawing(!isDrawing);
-    };
+export default function DrawingPage() {
+  const [isDrawingMode, setIsDrawingMode] = useState(true);
 
-    return (
-        <div className="flex flex-col items-center justify-center h-screen">
-            <h1 className="text-2xl font-bold mb-4">EchoLoop Drawing Page</h1>
-            <button 
-                onClick={toggleMode} 
-                className="mb-4 px-4 py-2 bg-blue-500 text-white rounded"
-            >
-                {isDrawing ? 'Switch to Writing Mode' : 'Switch to Drawing Mode'}
-            </button>
-            <DrawingCanvas isDrawing={isDrawing} />
-        </div>
-    );
-};
-
-export default DrawingPage;
+  return (
+    <section className="page-shell">
+      <div className="page-hero compact-hero">
+        <p className="page-kicker">Visual reflection</p>
+        <h1 className="page-title">Sketch your way through the noise.</h1>
+        <p className="page-copy">
+          Use drawing mode to mark up the canvas, or pause in writing mode when
+          you want the page to rest.
+        </p>
+        <button
+          onClick={() => setIsDrawingMode((currentMode) => !currentMode)}
+          className="toggle-pill"
+        >
+          {isDrawingMode ? "Switch to Writing Mode" : "Switch to Drawing Mode"}
+        </button>
+      </div>
+      <DrawingCanvas isDrawing={isDrawingMode} />
+    </section>
+  );
+}

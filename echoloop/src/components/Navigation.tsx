@@ -1,27 +1,26 @@
-import Link from 'next/link';
+import Link from "next/link";
 
-const Navigation = () => {
-    return (
-        <nav className="bg-gray-800 text-white h-full p-4">
-            <ul className="space-y-4">
-                <li>
-                    <Link href="/journal" className="hover:text-gray-400">Journal</Link>
-                </li>
-                <li>
-                    <Link href="/sleep" className="hover:text-gray-400">Sleep</Link>
-                </li>
-                <li>
-                    <Link href="/drawing" className="hover:text-gray-400">Reflect</Link>
-                </li>
-                <li>
-                    <Link href="/insights" className="hover:text-gray-400">Insights</Link>
-                </li>
-                <li>
-                    <Link href="/sounds" className="hover:text-gray-400">Calm</Link>
-                </li>
-            </ul>
-        </nav>
-    );
-};
+const links = [
+  { href: "/journal", label: "Journal" },
+  { href: "/sleep", label: "Sleep" },
+  { href: "/drawing", label: "Reflect" },
+  { href: "/insights", label: "Insights" },
+  { href: "/sounds", label: "Calm" },
+];
 
-export default Navigation;
+export default function Navigation() {
+  return (
+    <nav className="app-nav">
+      <p className="app-nav__label">Explore</p>
+      <ul className="app-nav__list">
+        {links.map((link) => (
+          <li key={link.href}>
+            <Link href={link.href} className="app-nav__link">
+              {link.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}

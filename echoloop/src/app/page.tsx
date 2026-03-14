@@ -1,31 +1,71 @@
-import React from 'react';
+import Link from "next/link";
 
-const HomePage = () => {
-    return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-            <h1 className="text-4xl font-bold mb-4">Welcome to EchoLoop</h1>
-            <p className="text-lg text-center mb-8">
-                Your journey to mental wellness starts here. Explore journaling, drawing, sleep awareness, ambient sounds, and reflection insights.
-            </p>
-            <div className="flex space-x-4">
-                <a href="/journal" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                    Start Journaling
-                </a>
-                <a href="/drawing" className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
-                    Start Drawing
-                </a>
-                <a href="/sleep" className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600">
-                    Sleep Awareness
-                </a>
-                <a href="/sounds" className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
-                    Ambient Sounds
-                </a>
-                <a href="/insights" className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
-                    Reflection Insights
-                </a>
-            </div>
-        </div>
-    );
-};
+const features = [
+  {
+    href: "/journal",
+    className: "feature-journal",
+    eyebrow: "Write it out",
+    title: "Journal",
+    copy: "Capture thoughts, moods, and quick inner check-ins in one soft space.",
+  },
+  {
+    href: "/drawing",
+    className: "feature-drawing",
+    eyebrow: "Sketch freely",
+    title: "Drawing",
+    copy: "Switch between reflection and freehand drawing when words are not enough.",
+  },
+  {
+    href: "/sleep",
+    className: "feature-sleep",
+    eyebrow: "Rest gently",
+    title: "Sleep",
+    copy: "Keep a lightweight sleep snapshot and browse a calm bedtime-friendly panel.",
+  },
+  {
+    href: "/sounds",
+    className: "feature-sounds",
+    eyebrow: "Set the mood",
+    title: "Sounds",
+    copy: "Preview your future ambient sound library and build a ritual around focus.",
+  },
+  {
+    href: "/insights",
+    className: "feature-insights",
+    eyebrow: "Notice patterns",
+    title: "Insights",
+    copy: "See simple reflection prompts and gentle patterns drawn from your routines.",
+  },
+];
 
-export default HomePage;
+export default function HomePage() {
+  return (
+    <section className="page-shell home-shell">
+      <div className="page-hero home-hero">
+        <p className="page-kicker">Mindful toolkit</p>
+        <h1 className="page-title">
+          EchoLoop turns quiet daily rituals into a visual rhythm.
+        </h1>
+        <p className="page-copy">
+          Move between journaling, sketching, sleep cues, ambient calm, and
+          reflection without leaving the same warm space.
+        </p>
+      </div>
+
+      <div className="feature-grid">
+        {features.map((feature) => (
+          <Link
+            key={feature.href}
+            href={feature.href}
+            className={`feature-tile ${feature.className}`}
+          >
+            <p className="feature-tile__eyebrow">{feature.eyebrow}</p>
+            <h2 className="feature-tile__title">{feature.title}</h2>
+            <p className="feature-tile__copy">{feature.copy}</p>
+            <span className="feature-tile__cta">Open section</span>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}

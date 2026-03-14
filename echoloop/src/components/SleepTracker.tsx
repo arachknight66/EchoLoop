@@ -1,33 +1,46 @@
-import React from 'react';
+"use client";
 
-const SleepTracker: React.FC = () => {
-    const [sleepData, setSleepData] = React.useState<any[]>([]);
-    
-    const importSleepData = () => {
-        // Logic to import sleep data from a file or API
-    };
+import { useState } from "react";
+import type { SleepEntryType } from "@/lib/types";
 
-    return (
-        <div className="p-4 bg-gray-100 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Sleep Tracker</h2>
-            <div className="mb-4">
-                <h3 className="text-lg font-medium">Your Sleep Schedule</h3>
-                <ul className="list-disc pl-5">
-                    {sleepData.map((entry, index) => (
-                        <li key={index}>
-                            {entry.date}: {entry.hours} hours
-                        </li>
-                    ))}
-                </ul>
-            </div>
-            <button 
-                onClick={importSleepData} 
-                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-                Import Sleep Data
-            </button>
-        </div>
+export default function SleepTracker() {
+  const [sleepData, setSleepData] = useState<SleepEntryType[]>([]);
+
+  const importSleepData = () => {
+    const today = new Date().toLocaleDateString();
+
+    setSleepData((currentEntries) =>
+      currentEntries.length > 0
+        ? currentEntries
+        : [{ date: today, hours: 8 }]
     );
-};
+  };
 
-export default SleepTracker;
+  return (
+    <div className="panel-card tracker-card">
+      <h2 className="mb-4 text-xl font-semibold">Sleep Tracker</h2>
+      <div className="mb-4">
+        <h3 className="text-lg font-medium">Your Sleep Schedule</h3>
+        {sleepData.length === 0 ? (
+          <p className="text-sm text-gray-600">
+            No sleep entries yet. Import data to see a sample record.
+          </p>
+        ) : (
+          <ul className="list-disc pl-5">
+            {sleepData.map((entry, index) => (
+              <li key={`${entry.date}-${index}`}>
+                {entry.date}: {entry.hours} hours
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+      <button
+        onClick={importSleepData}
+        className="panel-button"
+      >
+        Import Sleep Data
+      </button>
+    </div>
+  );
+}

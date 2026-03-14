@@ -1,20 +1,17 @@
-import React from 'react';
-import InsightsPanel from '@/components/InsightsPanel';
-import { useInsights } from '@/hooks/useInsights';
+import InsightsPanel from "@/components/InsightsPanel";
 
-const InsightsPage = () => {
-    const { insights } = useInsights();
-
-    return (
-        <div className="flex flex-col items-center justify-center p-4">
-            <h1 className="text-2xl font-bold mb-4">Reflection Insights</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {insights.map((insight, index) => (
-                    <InsightsPanel key={index} insight={insight} />
-                ))}
-            </div>
-        </div>
-    );
-};
-
-export default InsightsPage;
+export default function InsightsPage() {
+  return (
+    <section className="page-shell">
+      <div className="page-hero compact-hero">
+        <p className="page-kicker">Gentle patterns</p>
+        <h1 className="page-title">See the story your rituals are telling.</h1>
+        <p className="page-copy">
+          Until live journal syncing is enabled, this section shows a polished
+          preview of the kinds of reflection prompts EchoLoop can surface.
+        </p>
+      </div>
+      <InsightsPanel />
+    </section>
+  );
+}

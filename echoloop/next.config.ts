@@ -1,7 +1,7 @@
 module.exports = {
   reactStrictMode: true,
-  images: {
-    domains: ['your-image-domain.com'], // Add your image domains here
+  turbopack: {
+    root: __dirname,
   },
   env: {
     FIREBASE_API_KEY: process.env.FIREBASE_API_KEY,

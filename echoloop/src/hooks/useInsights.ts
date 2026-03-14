@@ -1,37 +1,45 @@
-import { useEffect, useState } from 'react';
-import { db } from '../lib/firebase';
-import { collection, getDocs } from 'firebase/firestore';
-import { JournalEntry } from '../lib/types';
+"use client";
 
-const useInsights = () => {
-    const [insights, setInsights] = useState<JournalEntry[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
+import { useEffect, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import type { JournalEntryType } from "@/lib/types";
 
-    useEffect(() => {
-        const fetchInsights = async () => {
-            try {
-                const querySnapshot = await getDocs(collection(db, 'journalEntries'));
-                const entries: JournalEntry[] = [];
-                querySnapshot.forEach((doc) => {
-                    entries.push({ id: doc.id, ...doc.data() } as JournalEntry);
-                });
-                setInsights(entries);
-            } catch (error) {
-                console.error("Error fetching insights: ", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+export const useInsights = () => {
+  const [insights, setInsights] = useState<JournalEntryType[]>([]);
+  const [loading, setLoading] = useState(true);
 
-        fetchInsights();
-    }, []);
+  useEffect(() => {
+    let cancelled = false;
 
-    const analyzeInsights = () => {
-        // Logic to analyze insights and generate reflection data
-        // This can include calculating mood trends, entry frequency, etc.
+    const fetchInsights = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "journalEntries"));
+        const entries = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...(doc.data() as Omit<JournalEntryType, "id">),
+        }));
+
+        if (!cancelled) {
+          setInsights(entries);
+        }
+      } catch (error) {
+        console.error("Error fetching insights: ", error);
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
     };
 
-    return { insights, loading, analyzeInsights };
+    void fetchInsights();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return { insights, loading };
 };
 
 export default useInsights;

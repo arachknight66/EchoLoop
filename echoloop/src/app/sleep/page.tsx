@@ -1,15 +1,22 @@
-import React from 'react';
-import SleepTracker from '@/components/SleepTracker';
-import SoundPlayer from '@/components/SoundPlayer';
+import SleepTracker from "@/components/SleepTracker";
+import SoundPlayer from "@/components/SoundPlayer";
 
-const SleepPage = () => {
-    return (
-        <div className="flex flex-col items-center justify-center p-4">
-            <h1 className="text-2xl font-bold mb-4">Sleep Overview</h1>
-            <SleepTracker />
-            <SoundPlayer />
-        </div>
-    );
-};
+export default function SleepPage() {
+  return (
+    <section className="page-shell">
+      <div className="page-hero compact-hero">
+        <p className="page-kicker">Night routine</p>
+        <h1 className="page-title">A softer landing for the end of the day.</h1>
+        <p className="page-copy">
+          Preview a gentle sleep dashboard with quick sleep notes and a calm
+          sound section prepared for future audio assets.
+        </p>
+      </div>
 
-export default SleepPage;
+      <div className="page-grid-2">
+        <SleepTracker />
+        <SoundPlayer />
+      </div>
+    </section>
+  );
+}

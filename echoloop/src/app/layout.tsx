@@ -1,19 +1,24 @@
-import React from 'react';
-import Header from '../components/Header';
-import Navigation from '../components/Navigation';
+import type { ReactNode } from "react";
+import Header from "@/components/Header";
+import Navigation from "@/components/Navigation";
+import "@/styles/globals.css";
 
-const Layout = ({ children }) => {
-    return (
-        <div className="flex flex-col h-screen">
-            <Header />
-            <div className="flex flex-1">
-                <Navigation />
-                <main className="flex-1 p-4">
-                    {children}
-                </main>
-            </div>
+export default function RootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body className="app-body">
+        <div className="app-shell">
+          <Header />
+          <div className="app-frame">
+            <Navigation />
+            <main className="app-main">{children}</main>
+          </div>
         </div>
-    );
-};
-
-export default Layout;
+      </body>
+    </html>
+  );
+}
