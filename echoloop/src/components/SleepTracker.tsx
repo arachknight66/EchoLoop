@@ -5,13 +5,22 @@ import { useSleep } from "@/hooks/useSleep";
 import { auth } from "@/lib/firebase";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import type { SleepEntryType } from "@/lib/types";
+import { 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer 
+} from "recharts";
 
 // ==========================================
 // 🛠️ HACKATHON DEV MODE TOGGLE
 // Set to 'true' to test with a fake week of data.
 // Set to 'false' to use the real Google Fit API.
 // ==========================================
-const DEV_MODE = false; 
+const DEV_MODE = true; 
 
 export default function SleepTracker() {
   const { sleepData, importSleepData, loading } = useSleep();
@@ -27,16 +36,14 @@ export default function SleepTracker() {
 
       if (DEV_MODE) {
         // --- 🧪 MOCK 7-DAY DATA BYPASS ---
-        console.log("DEV MODE: Injecting a week of mock smartwatch data...");
         await new Promise((resolve) => setTimeout(resolve, 800)); 
         
         const now = new Date().getTime();
         const mockSessions = [];
         
-        // Generate 7 days of sleep data ranging from 6 to 8.5 hours
         for (let i = 6; i >= 0; i--) {
           const endMillis = now - (i * 24 * 60 * 60 * 1000);
-          const randomHours = Math.random() * 2.5 + 6; // Random number between 6 and 8.5
+          const randomHours = Math.random() * 2.5 + 6; 
           const startMillis = endMillis - (randomHours * 60 * 60 * 1000);
           
           mockSessions.push({
@@ -60,7 +67,6 @@ export default function SleepTracker() {
         if (!token) throw new Error("Failed to retrieve Google access token.");
 
         const endTime = new Date().getTime();
-        // Changed from 1 day to 7 days (7 * 24 * 60 * 60 * 1000)
         const startTime = endTime - (7 * 24 * 60 * 60 * 1000); 
 
         const response = await fetch(
@@ -82,7 +88,6 @@ export default function SleepTracker() {
         return;
       }
 
-      // Map through every session in the array instead of just the last one
       const newEntries: SleepEntryType[] = fitData.session.map((session: any) => {
         const startMillis = parseInt(session.startTimeMillis, 10);
         const endMillis = parseInt(session.endTimeMillis, 10);
@@ -94,7 +99,6 @@ export default function SleepTracker() {
         };
       });
 
-      // Save all 7 entries to Firestore concurrently using Promise.all
       await Promise.all(newEntries.map(entry => importSleepData(entry)));
 
     } catch (error) {
@@ -105,37 +109,70 @@ export default function SleepTracker() {
     }
   };
 
+  // Sort data chronologically for the chart (oldest to newest)
+  const chartData = [...sleepData].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+
   return (
-    <div className="panel-card tracker-card">
+    <div className="panel-card tracker-card flex flex-col h-full">
       <h2 className="mb-4 text-xl font-semibold">
-        Sleep Tracker {DEV_MODE && <span className="text-sm text-red-500 ml-2">(DEV MODE)</span>}
+        Sleep Trends {DEV_MODE && <span className="text-sm text-red-500 ml-2">(DEV MODE)</span>}
       </h2>
-      <div className="mb-4">
-        <h3 className="text-lg font-medium">Your Sleep Schedule</h3>
-        
+      
+      <div className="flex-grow mb-6">
         {loading ? (
-          <p className="text-sm text-gray-600">Loading your data...</p>
+          <div className="h-48 flex items-center justify-center text-sm text-gray-500">
+            Loading your data...
+          </div>
         ) : sleepData.length === 0 ? (
-          <p className="text-sm text-gray-600">
-            No sleep entries yet. Import smartwatch data to begin.
-          </p>
+          <div className="h-48 flex items-center justify-center text-sm text-gray-500 text-center px-4">
+            No sleep entries yet. Import smartwatch data to begin visualizing your trends.
+          </div>
         ) : (
-          <ul className="list-disc pl-5">
-            {sleepData.map((entry, index) => (
-              <li key={entry.id || index}>
-                {entry.date}: {entry.hours} hours
-              </li>
-            ))}
-          </ul>
+          <div className="h-56 w-full mt-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                <XAxis 
+                  dataKey="date" 
+                  tick={{ fontSize: 12, fill: '#6B7280' }} 
+                  tickLine={false}
+                  axisLine={false}
+                  // Optional: format the date to just show Day/Month so it fits nicely
+                  tickFormatter={(value) => value.split('/')[0] + '/' + value.split('/')[1]}
+                />
+                <YAxis 
+                  tick={{ fontSize: 12, fill: '#6B7280' }} 
+                  tickLine={false}
+                  axisLine={false}
+                  domain={['dataMin - 1', 'dataMax + 1']}
+                />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  labelStyle={{ fontWeight: 'bold', color: '#374151' }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="hours" 
+                  stroke="#3B82F6" 
+                  strokeWidth={3} 
+                  dot={{ r: 4, fill: '#3B82F6', strokeWidth: 0 }} 
+                  activeDot={{ r: 6, fill: '#1D4ED8' }} 
+                  animationDuration={1500}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         )}
       </div>
 
-      {errorMsg && <p className="text-red-500 text-sm mb-2">{errorMsg}</p>}
+      {errorMsg && <p className="text-red-500 text-sm mb-3">{errorMsg}</p>}
 
       <button
         onClick={handleFetchSmartwatchData}
         disabled={isFetchingAuth}
-        className="panel-button disabled:opacity-50"
+        className="panel-button disabled:opacity-50 mt-auto"
       >
         {isFetchingAuth ? "Fetching 7 Days..." : "Import Smartwatch Data"}
       </button>
