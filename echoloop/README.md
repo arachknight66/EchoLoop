@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EchoLoop
+
+EchoLoop is a mental wellness web application designed to support users in their journey towards better mental health. The application includes features for journaling, drawing, sleep awareness, ambient sounds, and reflection insights.
+
+## Features
+
+- **Journaling**: Users can write journal entries, tag their mood, and save them to Firebase Firestore for future reflection.
+- **Drawing**: A dedicated drawing page allows users to express themselves creatively through writing and drawing on an HTML5 canvas.
+- **Sleep Awareness**: Users can track their sleep patterns and view an overview of their sleep schedule, along with ambient sounds to aid relaxation.
+- **Ambient Sounds**: A collection of calming sounds is available for users to play, helping them to relax and focus.
+- **Reflection Insights**: The application analyzes journal entries and provides insights into behavioral trends, helping users to reflect on their mental wellness journey.
+
+## Technologies Used
+
+- **Next.js**: A React framework for building server-rendered applications.
+- **Tailwind CSS**: A utility-first CSS framework for styling the application.
+- **Framer Motion**: A library for animations and transitions in React applications.
+- **Firebase Firestore**: A cloud-hosted NoSQL database for storing user data securely.
 
 ## Getting Started
 
-First, run the development server:
+To get started with the EchoLoop application, follow these steps:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/arachknight66/EchoLoop.git
+   cd EchoLoop
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Set up Firebase**:
+   - Create a Firebase project and configure Firestore.
+   - Update the Firebase configuration in `src/lib/firebase.ts` with your project credentials.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. **Run the application**:
+   ```bash
+   npm run dev
+   ```
 
-## Learn More
+5. **Open your browser**:
+   Navigate to `http://localhost:3000` to view the application.
 
-To learn more about Next.js, take a look at the following resources:
+## Contributing
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Contributions are welcome! If you have suggestions for improvements or new features, please open an issue or submit a pull request.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## License
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is licensed under the MIT License. See the LICENSE file for details.
