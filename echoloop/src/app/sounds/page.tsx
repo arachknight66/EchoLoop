@@ -1,18 +1,21 @@
-import SoundPlayer from "@/components/SoundPlayer";
+import SoundMixer from "@/components/SoundMixer";
+import MeditationTimer from "@/components/MeditationTimer";
 
 export default function SoundsPage() {
   return (
     <section className="page-shell">
       <div className="page-hero compact-hero">
-        <p className="page-kicker">Ambient preview</p>
-        <h1 className="page-title">Set the room before the sounds arrive.</h1>
+        <p className="page-kicker">Ambient Soundscapes & Meditation</p>
+        <h1 className="page-title">Create your perfect calm environment.</h1>
         <p className="page-copy">
-          The audio files are still missing, so this page acts as a styled
-          preview of the listening experience and the sound categories.
+          Mix individual sounds to create custom ambient soundscapes, or use the
+          meditation timer to guide your practice with gentle ambient music.
         </p>
       </div>
-      <div className="panel-card">
-        <SoundPlayer />
+
+      <div className="sounds-page-container">
+        <MeditationTimer />
+        <SoundMixer />
       </div>
     </section>
   );
