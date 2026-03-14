@@ -1,4 +1,5 @@
 import SleepTracker from "@/components/SleepTracker";
+import SleepAnalysis from "@/components/SleepAnalysis";
 import SoundPlayer from "@/components/SoundPlayer";
 
 export default function SleepPage() {
@@ -8,13 +9,17 @@ export default function SleepPage() {
         <p className="page-kicker">Night routine</p>
         <h1 className="page-title">A softer landing for the end of the day.</h1>
         <p className="page-copy">
-          Preview a gentle sleep dashboard with quick sleep notes and a calm
-          sound section prepared for future audio assets.
+          Discover your sleep pattern analysis, track your sleep habits, and choose
+          from curated ambient mixes designed for restful nights.
         </p>
       </div>
 
-      <div className="page-grid-2">
+      <div className="sleep-page-grid">
         <SleepTracker />
+        <SleepAnalysis />
+      </div>
+
+      <div className="panel-card">
         <SoundPlayer />
       </div>
     </section>
