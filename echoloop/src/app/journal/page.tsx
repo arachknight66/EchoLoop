@@ -1,88 +1,127 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
+import JournalDrawingCanvas from "@/components/JournalDrawingCanvas";
 // import { collection, addDoc } from "firebase/firestore";
 // import { db } from "@/lib/firebase";
 
 const JournalPage = () => {
   const [entry, setEntry] = useState("");
-  const [mood, setMood] = useState("");
+  const [canvasData, setCanvasData] = useState<string | null>(null);
+  const [canvasResetToken, setCanvasResetToken] = useState(0);
   const [savedPreview, setSavedPreview] = useState<{
     text: string;
-    mood: string;
+    hasSketch: boolean;
   } | null>(null);
 
+  const handleCanvasDataChange = (data: string | null) => {
+    setCanvasData(data);
+  };
+
   const handleSaveEntry = async () => {
-    if (entry.trim() === "") return;
+    if (entry.trim() === "" && !canvasData) {
+      return;
+    }
 
     // Firestore save is disabled until the Firebase project is configured.
     // await addDoc(collection(db, "journalEntries"), {
     //   text: entry,
-    //   mood,
+    //   sketch: canvasData,
     //   timestamp: new Date(),
     // });
 
     setSavedPreview({
       text: entry,
-      mood: mood || "Not selected",
+      hasSketch: !!canvasData,
     });
     setEntry("");
-    setMood("");
+    setCanvasData(null);
+    setCanvasResetToken((prev) => prev + 1);
   };
 
   return (
     <section className="page-shell">
-      <div className="page-hero compact-hero">
-        <p className="page-kicker">Daily journal</p>
-        <h1 className="page-title">Write what this moment feels like.</h1>
+      <motion.div
+        className="page-hero compact-hero"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <h1 className="page-title">How are you feeling today</h1>
         <p className="page-copy">
-          The live backend is paused for now, but the interface is ready for
-          fast thought-dumps, mood tagging, and previewing what you wrote.
+          Combine words and sketches to capture your thoughts. Save both
+          together as a complete reflection.
         </p>
-      </div>
+      </motion.div>
 
-      <div className="panel-card journal-card">
-        <h2 className="mb-4 text-xl font-bold">Journal Entry</h2>
-        <div className="journal-form">
-          <textarea
-            className="w-full h-32 p-2 border border-gray-300 rounded-md"
-            placeholder="Write your thoughts..."
-            value={entry}
-            onChange={(e) => setEntry(e.target.value)}
-          />
-          <div className="mt-4">
-            <label className="form-label">Mood</label>
-            <select
-              className="w-full border border-gray-300 rounded-md p-2"
-              value={mood}
-              onChange={(e) => setMood(e.target.value)}
-            >
-              <option value="">Select mood</option>
-              <option value="happy">Happy</option>
-              <option value="sad">Sad</option>
-              <option value="anxious">Anxious</option>
-              <option value="calm">Calm</option>
-            </select>
-          </div>
-          <button className="panel-button" onClick={handleSaveEntry}>
-            Save Preview
-          </button>
-          <p className="mt-3 text-sm text-gray-500">
-            Live saving is commented out until Firebase env vars are added.
-          </p>
-          {savedPreview ? (
-            <div className="preview-card">
-              <p className="text-sm font-semibold text-gray-700">
-                Latest preview entry
-              </p>
-              <p className="mt-2 text-sm text-gray-900">{savedPreview.text}</p>
-              <p className="mt-1 text-xs text-gray-600">
-                Mood: {savedPreview.mood}
-              </p>
+      <motion.div
+        className="journal-container"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
+        <div className="journal-card panel-card">
+          <div className="journal-composer">
+            <div className="journal-form">
+              <textarea
+                className="journal-textarea"
+                placeholder="Express what's on your mind..."
+                value={entry}
+                onChange={(e) => setEntry(e.target.value)}
+              />
+              <JournalDrawingCanvas
+                key={canvasResetToken}
+                onCanvasDataChange={handleCanvasDataChange}
+              />
             </div>
-          ) : null}
+          </div>
         </div>
-      </div>
+      </motion.div>
+
+      <motion.div
+        className="journal-save-section"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+      >
+        <motion.button
+          className="journal-save-btn"
+          onClick={handleSaveEntry}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          disabled={entry.trim() === "" && !canvasData}
+        >
+          Save Reflection
+        </motion.button>
+        <p className="journal-save-note">
+          {entry.trim() !== "" && canvasData
+            ? "Text & sketch ready"
+            : entry.trim() !== ""
+              ? "Text saved"
+              : canvasData
+                ? "Sketch saved"
+                : "Add text or sketch"}
+        </p>
+      </motion.div>
+
+      {savedPreview ? (
+        <motion.div
+          className="preview-card"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <p className="preview-title">Latest reflection</p>
+          {savedPreview.text && (
+            <p className="preview-text">{savedPreview.text}</p>
+          )}
+          {savedPreview.hasSketch && (
+            <p className="preview-sketch">✓ Sketch included</p>
+          )}
+        </motion.div>
+      ) : null}
     </section>
   );
 };

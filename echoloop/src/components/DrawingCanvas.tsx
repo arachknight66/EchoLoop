@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 
 type DrawingCanvasProps = {
   isDrawing: boolean;
+  onSaveDrawing?: (data: string) => void;
 };
 
-export default function DrawingCanvas({ isDrawing }: DrawingCanvasProps) {
+export default function DrawingCanvas({ isDrawing, onSaveDrawing }: DrawingCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
   const [isPointerDown, setIsPointerDown] = useState(false);
+  const [hasUnsavedDrawing, setHasUnsavedDrawing] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -26,6 +29,7 @@ export default function DrawingCanvas({ isDrawing }: DrawingCanvasProps) {
 
     context.lineCap = "round";
     context.lineWidth = 5;
+    context.strokeStyle = "#DCDBCE";
     contextRef.current = context;
   }, []);
 
@@ -43,6 +47,7 @@ export default function DrawingCanvas({ isDrawing }: DrawingCanvasProps) {
     context.beginPath();
     context.moveTo(event.nativeEvent.offsetX, event.nativeEvent.offsetY);
     setIsPointerDown(true);
+    setHasUnsavedDrawing(true);
   };
 
   const draw = (event: React.MouseEvent<HTMLCanvasElement>) => {
@@ -67,6 +72,14 @@ export default function DrawingCanvas({ isDrawing }: DrawingCanvasProps) {
     setIsPointerDown(false);
   };
 
+  const saveDrawing = () => {
+    const canvas = canvasRef.current;
+    if (canvas && onSaveDrawing) {
+      onSaveDrawing(canvas.toDataURL());
+      setHasUnsavedDrawing(false);
+    }
+  };
+
   const clearCanvas = () => {
     const canvas = canvasRef.current;
     const context = contextRef.current;
@@ -76,10 +89,16 @@ export default function DrawingCanvas({ isDrawing }: DrawingCanvasProps) {
     }
 
     context.clearRect(0, 0, canvas.width, canvas.height);
+    setHasUnsavedDrawing(false);
   };
 
   return (
-    <div className="panel-card canvas-panel">
+    <motion.div
+      className="panel-card canvas-panel"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
       <canvas
         ref={canvasRef}
         width={800}
@@ -97,12 +116,28 @@ export default function DrawingCanvas({ isDrawing }: DrawingCanvasProps) {
           ? "Drawing mode is active."
           : "Writing mode is selected. Switch back to drawing to sketch on the canvas."}
       </p>
-      <button
-        onClick={clearCanvas}
-        className="panel-button"
-      >
-        Clear Canvas
-      </button>
-    </div>
+      <div className="canvas-button-group">
+        <motion.button
+          onClick={saveDrawing}
+          className="canvas-save-btn"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          disabled={!hasUnsavedDrawing}
+        >
+          Save Sketch
+        </motion.button>
+        <motion.button
+          onClick={clearCanvas}
+          className="canvas-clear-btn"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          Clear Canvas
+        </motion.button>
+      </div>
+      {hasUnsavedDrawing && (
+        <p className="canvas-unsaved-note">Unsaved changes</p>
+      )}
+    </motion.div>
   );
 }
