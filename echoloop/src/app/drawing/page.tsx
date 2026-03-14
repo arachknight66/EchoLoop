@@ -1,145 +1,104 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import ReflectionChatbot from "@/components/ReflectionChatbot";
 
-const SleepPersona = () => (
-  <motion.div
-    className="sidebar-card"
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.6, delay: 0.3 }}
-  >
-    <h3 className="sidebar-card__title">Sleep Persona</h3>
-    <div className="persona-circle">
-      <motion.div
-        className="persona-dot"
-        animate={{ scale: [1, 1.2, 1] }}
-        transition={{ duration: 3, repeat: Infinity }}
-      />
-    </div>
-    <p className="sidebar-card__subtitle">The Drifter</p>
-    <p className="sidebar-card__copy">Fluid sleep rhythm</p>
-    <div className="soundscape-viz">
-      <motion.span
-        animate={{ opacity: [0.5, 1, 0.5] }}
-        transition={{ duration: 2, repeat: Infinity }}
-      >
-        Soundscape ▁▂▃▄▅▄▃▂▁
-      </motion.span>
-    </div>
-  </motion.div>
-);
+const quotes = [
+  {
+    text: "The mind is everything. What you think, you become.",
+    author: "Buddha",
+  },
+  {
+    text: "In the middle of difficulty lies opportunity.",
+    author: "Albert Einstein",
+  },
+  {
+    text: "Be yourself; everyone else is already taken.",
+    author: "Oscar Wilde",
+  },
+  {
+    text: "The only way to do great work is to love what you do.",
+    author: "Steve Jobs",
+  },
+  {
+    text: "Life is what happens when you're busy making other plans.",
+    author: "John Lennon",
+  },
+  {
+    text: "It is during our darkest moments that we must focus to see the light.",
+    author: "Aristotle",
+  },
+  {
+    text: "The only impossible journey is the one you never begin.",
+    author: "Tony Robbins",
+  },
+  {
+    text: "Happiness is not something ready made. It comes from your own actions.",
+    author: "Dalai Lama",
+  },
+  {
+    text: "You are never too old to set another goal or to dream a new dream.",
+    author: "C.S. Lewis",
+  },
+  {
+    text: "The future belongs to those who believe in the beauty of their dreams.",
+    author: "Eleanor Roosevelt",
+  },
+];
 
-const ReflectionCompanion = () => (
-  <motion.div
-    className="sidebar-card"
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.6, delay: 0.4 }}
-  >
-    <h3 className="sidebar-card__title">Reflection Companion</h3>
-    <motion.div
-      className="insights-list"
-      initial="hidden"
-      animate="visible"
-      variants={{
-        hidden: { opacity: 0 },
-        visible: {
-          opacity: 1,
-          transition: {
-            staggerChildren: 0.1,
-          },
-        },
-      }}
-    >
-      {[
-        "You've mentioned feeling quieter this week.",
-        "Your drawings have been using softer strokes lately.",
-      ].map((insight, idx) => (
-        <motion.div
-          key={idx}
-          className="insight-item"
-          variants={{
-            hidden: { opacity: 0, x: -10 },
-            visible: { opacity: 1, x: 0 },
-          }}
-        >
-          {insight}
-        </motion.div>
-      ))}
-    </motion.div>
-    <p className="sidebar-card__action">Continue reflecting...</p>
-  </motion.div>
-);
-
-const WeeklyInsights = () => (
-  <motion.div
-    className="sidebar-card"
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.6, delay: 0.5 }}
-  >
-    <h3 className="sidebar-card__title">Weekly Pattern Insight</h3>
-    <motion.div
-      className="insights-list"
-      initial="hidden"
-      animate="visible"
-      variants={{
-        hidden: { opacity: 0 },
-        visible: {
-          opacity: 1,
-          transition: {
-            staggerChildren: 0.08,
-          },
-        },
-      }}
-    >
-      {[
-        "Sleep shifted later",
-        "Expression shortened",
-        "Drawing intensity increased",
-      ].map((pattern, idx) => (
-        <motion.div
-          key={idx}
-          className="pattern-item"
-          variants={{
-            hidden: { opacity: 0, x: -10 },
-            visible: { opacity: 1, x: 0 },
-          }}
-        >
-          ● {pattern}
-        </motion.div>
-      ))}
-    </motion.div>
-  </motion.div>
-);
+function getQuoteOfDay() {
+  const today = new Date();
+  const dayOfYear = Math.floor(
+    (today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000
+  );
+  return quotes[dayOfYear % quotes.length];
+}
 
 export default function DrawingPage() {
+  const [quote, setQuote] = useState(quotes[0]);
+
+  useEffect(() => {
+    setQuote(getQuoteOfDay());
+  }, []);
+
   return (
-    <main className="reflection-page-container">
+    <div className="reflection-page-container">
       <motion.section
         className="reflection-page-shell"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
+        {/* Daily Quote Section */}
         <motion.div
-          className="page-hero compact-hero"
-          initial={{ opacity: 0, y: 20 }}
+          className="quote-of-day"
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <p className="page-kicker">Silent Reflection</p>
-          <h1 className="page-title">Share your inner thoughts.</h1>
-          <p className="page-copy">
-            A quiet space to explore your feelings and insights through
-            conversation. Let your reflections guide you.
-          </p>
+          <div className="quote-icon">✦</div>
+          <blockquote className="quote-text">"{quote.text}"</blockquote>
+          <p className="quote-author">— {quote.author}</p>
         </motion.div>
 
-        <ReflectionChatbot />
+        {/* Chatbot Section */}
+        <motion.div
+          className="reflection-chatbot-wrapper"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
+          <div className="chatbot-section-header">
+            <p className="chatbot-kicker">Reflection Companion</p>
+            <h1 className="chatbot-section-title">Share your thoughts</h1>
+            <p className="chatbot-section-copy">
+              A quiet space for meaningful conversation and self-discovery.
+            </p>
+          </div>
+          <ReflectionChatbot />
+        </motion.div>
       </motion.section>
-    </main>
+    </div>
   );
 }

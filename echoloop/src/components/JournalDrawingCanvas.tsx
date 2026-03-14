@@ -47,6 +47,9 @@ export default function JournalDrawingCanvas({
       return;
     }
 
+    // Completely clear the canvas
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    // Fill with background
     fillCanvasBackground(canvas, context);
     setHasDrawing(false);
     onCanvasDataChangeRef.current?.(null);
