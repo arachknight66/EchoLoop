@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 
 const CANVAS_BACKGROUND = "rgba(50, 50, 50, 0.8)";
 const CANVAS_STROKE_COLOR = "#DCDBCE";
