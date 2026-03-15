@@ -11,7 +11,7 @@ const links = [
   { href: "/sounds", label: "Calm" },
 ];
 
-const containerVariants = {
+const containerVariants : Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
