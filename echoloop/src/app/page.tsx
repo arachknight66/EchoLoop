@@ -12,7 +12,7 @@ const features = [
     href: "/drawing",
     className: "feature-drawing",
     eyebrow: "Sketch freely",
-    title: "Drawing",
+    title: "Reflection",
     copy: "Switch between reflection and freehand drawing when words are not enough.",
   },
   {

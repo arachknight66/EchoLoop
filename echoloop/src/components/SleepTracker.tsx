@@ -23,7 +23,7 @@ import {
 // Set to 'true' to test with a fake week of data.
 // Set to 'false' to use the real Google Fit API.
 // ==========================================
-const DEV_MODE = true; 
+const DEV_MODE = false; 
 
 export default function SleepTracker() {
   const { sleepData, importSleepData, loading } = useSleep();

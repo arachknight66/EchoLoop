@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion,Variants } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 
 type Message = {
@@ -85,7 +85,7 @@ export default function ReflectionChatbot() {
   return (
     <div className="panel-card flex flex-col h-[500px]">
       <div className="border-b border-gray-100 pb-3 mb-4">
-        <h2 className="text-xl font-semibold">Reflection Guide</               h2>
+        <h2 className="text-xl font-semibold">Reflection Guide</h2>
         <p className="text-sm text-gray-500">A safe space to untangle your thoughts.</p>
       </div>
 
@@ -104,7 +104,7 @@ export default function ReflectionChatbot() {
               className={`max-w-[85%] text-sm ${
                 msg.role === "user"
                   ? "p-3.5 bg-blue-500 text-white rounded-2xl rounded-br-none shadow-sm hover:shadow-md"
-                  : "text-gray-800 hover:opacity-80 transition-opacity" // Removed the borders, background, and padding for Gemini
+                  : "text-gray-800 hover:opacity-80 transition-opacity" 
               }`}
             >
               <ReactMarkdown 
@@ -127,7 +127,6 @@ export default function ReflectionChatbot() {
             animate={{ opacity: 1 }}
             className="flex justify-start"
           >
-            {/* Kept the loading indicator styled so the user knows it's "typing" */}
             <div className="text-gray-500 text-sm flex space-x-1">
               <span className="animate-bounce">.</span>
               <span className="animate-bounce delay-100">.</span>
@@ -139,7 +138,8 @@ export default function ReflectionChatbot() {
       </div>
 
       {/* Input Area */}
-      <form onSubmit={handleSendMessage} style="mt-auto flex w-full items-center gap-4 pt-3">
+      {/* FIXED: Changed 'style' to 'className' */}
+      <form onSubmit={handleSendMessage} className="mt-auto flex w-full items-center gap-4 pt-3">
         <motion.input
           whileFocus={{ scale: 1.01 }}
           whileHover={{ borderColor: "#60a5fa" }}
@@ -148,8 +148,8 @@ export default function ReflectionChatbot() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Type your reflection here..."
-          // Replaced flex-grow with flex-1 to ensure it properly consumes remaining space
-          style="flex-1 min-w-0 h-11 px-4 py-2.5 text-sm border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400/50 bg-white text-gray-800 shadow-sm transition-all box-border"
+          // FIXED: Changed 'style' to 'className'
+          className="flex-1 min-w-0 h-11 px-4 py-2.5 text-sm border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400/50 bg-white text-gray-800 shadow-sm transition-all box-border"
           disabled={isLoading}
         />
         <motion.button
@@ -158,9 +158,8 @@ export default function ReflectionChatbot() {
           whileHover={{ scale: 1.05, boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)" }}
           whileTap={{ scale: 0.98 }}
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
-          // Ensure it has a matching box-border height. 
-          // Note: Temporarily remove 'panel-button' to test if it's the culprit!
-          style="h-11 min-w-[112px] shrink-0 px-5 py-2.5 text-sm font-medium bg-blue-500 text-white rounded-full disabled:opacity-50 shadow-sm transition-all flex items-center justify-center box-border"
+          // FIXED: Changed 'style' to 'className'
+          className="h-11 min-w-[112px] shrink-0 px-3 py-3 text-sm font-medium bg-blue-500 text-white rounded-full disabled:opacity-50 shadow-sm transition-all flex items-center justify-center box-border"
         >
           Send
         </motion.button>
