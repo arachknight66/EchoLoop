@@ -85,7 +85,7 @@ export default function ReflectionChatbot() {
   return (
     <div className="panel-card flex flex-col h-[500px]">
       <div className="border-b border-gray-100 pb-3 mb-4">
-        <h2 className="text-xl font-semibold">Reflection Guide</h2>
+        <h2 className="text-xl font-semibold">Reflection Guide</               h2>
         <p className="text-sm text-gray-500">A safe space to untangle your thoughts.</p>
       </div>
 
@@ -98,11 +98,13 @@ export default function ReflectionChatbot() {
             animate={{ opacity: 1, y: 0 }}
             className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
-            <div
+            <motion.div
+              whileHover={{ scale: 1.02, y: -2 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
               className={`max-w-[85%] text-sm ${
                 msg.role === "user"
-                  ? "p-3.5 bg-blue-500 text-white rounded-2xl rounded-br-none shadow-sm"
-                  : "text-gray-800" // Removed the borders, background, and padding for Gemini
+                  ? "p-3.5 bg-blue-500 text-white rounded-2xl rounded-br-none shadow-sm hover:shadow-md"
+                  : "text-gray-800 hover:opacity-80 transition-opacity" // Removed the borders, background, and padding for Gemini
               }`}
             >
               <ReactMarkdown 
@@ -114,7 +116,7 @@ export default function ReflectionChatbot() {
               >
                 {msg.parts[0].text}
               </ReactMarkdown>
-            </div>
+            </motion.div>
           </motion.div>
         ))}
         
@@ -139,7 +141,10 @@ export default function ReflectionChatbot() {
       {/* Input Area */}
       {/* Increased gap from gap-4 to gap-20 (5x) */}
       <form onSubmit={handleSendMessage} className="mt-auto flex gap-20 items-center pt-2">
-        <input
+        <motion.input
+          whileFocus={{ scale: 1.02 }}
+          whileHover={{ borderColor: "#60a5fa" }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -148,14 +153,17 @@ export default function ReflectionChatbot() {
           className="flex-grow py-1.5 px-3 h-8 text-xs border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400/50 bg-white text-gray-800 shadow-sm transition-all"
           disabled={isLoading}
         />
-        <button
+        <motion.button
           type="submit"
           disabled={!input.trim() || isLoading}
+          whileHover={{ scale: 1.05, boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)" }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
           // Added h-8, text-xs, and flex to ensure horizontal alignment with the input
-          className="panel-button px-4 py-1.5 h-8 text-xs rounded-full disabled:opacity-50 shadow-sm transition-all flex items-center justify-center"
+          className="panel-button px-3 py-1.5 h-8 text-xs rounded-full disabled:opacity-50 shadow-sm transition-all flex items-center justify-center"
         >
           Send
-        </button>
+        </motion.button>
       </form>
     </div>
   );

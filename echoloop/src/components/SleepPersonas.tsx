@@ -2,6 +2,16 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { useSleep } from "@/hooks/useSleep";
 
 type SleepPersona = {
   id: string;
@@ -111,7 +121,28 @@ export default function SleepPersonas({
 }: {
   analysis?: SleepTrackerAnalysis;
 }) {
+  const { sleepData } = useSleep();
   const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
+
+  // Mock sleep data for testing/demo purposes
+  const mockSleepData = [
+    { id: "1", date: "3/8/2026", hours: 7.5 },
+    { id: "2", date: "3/9/2026", hours: 6.8 },
+    { id: "3", date: "3/10/2026", hours: 8.2 },
+    { id: "4", date: "3/11/2026", hours: 7.1 },
+    { id: "5", date: "3/12/2026", hours: 9.0 },
+    { id: "6", date: "3/13/2026", hours: 7.3 },
+    { id: "7", date: "3/14/2026", hours: 8.5 },
+    { id: "8", date: "3/15/2026", hours: 7.9 },
+  ];
+
+  // Use mock data if no real sleep data exists
+  const displaySleepData = sleepData.length > 0 ? sleepData : mockSleepData;
+
+  // Sort sleep data chronologically (oldest to newest)
+  const chartData = [...displaySleepData].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
 
   // Determine persona based on analysis
   const determinePersona = (): SleepPersona | null => {
@@ -163,7 +194,124 @@ export default function SleepPersonas({
         </motion.div>
       )}
 
-      {/* All Personas Grid */}
+      {/* Sleep Pattern Graph */}
+      {displaySleepData.length > 0 && (
+        <motion.div
+          className="sleep-pattern-section"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <h2 className="mixer-section-title">Your Sleep Pattern</h2>
+          <p className="mixer-section-subtitle">
+            Visualizing your sleep duration over time
+          </p>
+          
+          <div className="sleep-graph-container">
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart
+                data={chartData}
+                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="#E5E7EB"
+                />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fontSize: 12, fill: "#6B7280" }}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value) =>
+                    value.split("/")[0] + "/" + value.split("/")[1]
+                  }
+                />
+                <YAxis
+                  tick={{ fontSize: 12, fill: "#6B7280" }}
+                  tickLine={false}
+                  axisLine={false}
+                  domain={["dataMin - 1", "dataMax + 1"]}
+                  label={{ value: "Hours", angle: -90, position: "insideLeft" }}
+                />
+                <Tooltip
+                  contentStyle={{
+                    borderRadius: "8px",
+                    border: "none",
+                    boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                  }}
+                  labelStyle={{ fontWeight: "bold", color: "#374151" }}
+                  formatter={(value) => [`${value}h`, "Sleep"]}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="hours"
+                  stroke="#3B82F6"
+                  strokeWidth={3}
+                  dot={{ r: 5, fill: "#3B82F6", strokeWidth: 0 }}
+                  activeDot={{ r: 7, fill: "#1D4ED8" }}
+                  animationDuration={1500}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          {displaySleepData.length > 0 && (
+            <motion.div
+              className="sleep-stats-summary"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <div className="stat-item">
+                <span className="stat-label">Average Sleep</span>
+                <span className="stat-value">
+                  {(
+                    displaySleepData.reduce((acc, entry) => acc + entry.hours, 0) /
+                    displaySleepData.length
+                  ).toFixed(1)}
+                  h
+                </span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Total Entries</span>
+                <span className="stat-value">{displaySleepData.length}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Max Sleep</span>
+                <span className="stat-value">
+                  {Math.max(...displaySleepData.map((e) => e.hours))}h
+                </span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Min Sleep</span>
+                <span className="stat-value">
+                  {Math.min(...displaySleepData.map((e) => e.hours))}h
+                </span>
+              </div>
+            </motion.div>
+          )}
+        </motion.div>
+      )}
+
+      {displaySleepData.length === 0 && (
+        <motion.div
+          className="sleep-pattern-section"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <h2 className="mixer-section-title">Your Sleep Pattern</h2>
+          <p className="mixer-section-subtitle">
+            Import smartwatch data to see your sleep visualization
+          </p>
+          <div className="text-center py-8 text-gray-400">
+            <p>No sleep data yet. Start tracking to see your sleep patterns!</p>
+          </div>
+        </motion.div>
+      )}
+
+      
       <motion.div
         className="all-personas-section"
         initial={{ opacity: 0, y: 20 }}

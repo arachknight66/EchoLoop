@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { useSleep } from "@/hooks/useSleep";
 import { auth } from "@/lib/firebase";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
@@ -26,6 +27,16 @@ export default function SleepTracker() {
   const { sleepData, importSleepData, loading } = useSleep();
   const [isFetchingAuth, setIsFetchingAuth] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+
+  const mockSleepData: SleepEntryType[] = [
+    { date: "3/9/2026", hours: 6.9 },
+    { date: "3/10/2026", hours: 7.4 },
+    { date: "3/11/2026", hours: 7.1 },
+    { date: "3/12/2026", hours: 8.0 },
+    { date: "3/13/2026", hours: 7.6 },
+    { date: "3/14/2026", hours: 8.2 },
+    { date: "3/15/2026", hours: 7.8 },
+  ];
 
   const handleFetchSmartwatchData = async () => {
     setIsFetchingAuth(true);
@@ -109,8 +120,10 @@ export default function SleepTracker() {
     }
   };
 
+  const displayData = sleepData.length > 0 ? sleepData : DEV_MODE ? mockSleepData : [];
+
   // Sort data chronologically for the chart (oldest to newest)
-  const chartData = [...sleepData].sort(
+  const chartData = [...displayData].sort(
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
   );
 
@@ -125,7 +138,7 @@ export default function SleepTracker() {
           <div className="h-48 flex items-center justify-center text-sm text-gray-500">
             Loading your data...
           </div>
-        ) : sleepData.length === 0 ? (
+        ) : chartData.length === 0 ? (
           <div className="h-48 flex items-center justify-center text-sm text-gray-500 text-center px-4">
             No sleep entries yet. Import smartwatch data to begin visualizing your trends.
           </div>
@@ -136,21 +149,26 @@ export default function SleepTracker() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                 <XAxis 
                   dataKey="date" 
-                  tick={{ fontSize: 12, fill: '#6B7280' }} 
+                  tick={{ fontSize: 12, fill: '#DCDBCE' }} 
                   tickLine={false}
                   axisLine={false}
                   // Optional: format the date to just show Day/Month so it fits nicely
                   tickFormatter={(value) => value.split('/')[0] + '/' + value.split('/')[1]}
                 />
                 <YAxis 
-                  tick={{ fontSize: 12, fill: '#6B7280' }} 
+                  tick={{ fontSize: 12, fill: '#DCDBCE' }} 
                   tickLine={false}
                   axisLine={false}
                   domain={['dataMin - 1', 'dataMax + 1']}
                 />
                 <Tooltip 
-                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  labelStyle={{ fontWeight: 'bold', color: '#374151' }}
+                  contentStyle={{
+                    borderRadius: '8px',
+                    border: '1px solid rgba(220, 219, 206, 0.2)',
+                    background: 'rgba(30, 30, 30, 0.95)',
+                    color: '#FFFFFF'
+                  }}
+                  labelStyle={{ fontWeight: 'bold', color: '#DCDBCE' }}
                 />
                 <Line 
                   type="monotone" 
@@ -165,17 +183,26 @@ export default function SleepTracker() {
             </ResponsiveContainer>
           </div>
         )}
+
+        {!loading && DEV_MODE && sleepData.length === 0 && (
+          <p className="mt-2 text-xs text-gray-400">
+            Showing mock trend data. Click Import Smartwatch Data to replace with real smartwatch entries.
+          </p>
+        )}
       </div>
 
       {errorMsg && <p className="text-red-500 text-sm mb-3">{errorMsg}</p>}
 
-      <button
+      <motion.button
         onClick={handleFetchSmartwatchData}
         disabled={isFetchingAuth}
-        className="panel-button disabled:opacity-50 mt-auto"
+        whileHover={{ scale: 1.05, boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)" }}
+        whileTap={{ scale: 0.98 }}
+        transition={{ type: "spring", stiffness: 400, damping: 17 }}
+        className="panel-button disabled:opacity-50 disabled:hover:scale-100 mt-auto"
       >
         {isFetchingAuth ? "Fetching 7 Days..." : "Import Smartwatch Data"}
-      </button>
+      </motion.button>
     </div>
   );
 }

@@ -1,5 +1,7 @@
 "use client";
 
+import { motion } from "framer-motion";
+
 // import { useInsights } from "@/hooks/useInsights";
 
 const previewInsights = [
@@ -29,10 +31,15 @@ export default function InsightsPanel() {
       </p>
       <ul className="insight-list">
         {previewInsights.map((insight) => (
-          <li key={insight.title} className="insight-card">
-            <p className="font-medium text-gray-900">{insight.title}</p>
+          <motion.li
+            key={insight.title}
+            className="insight-card"
+            whileHover={{ scale: 1.02, y: -2 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          >
+            <p style={{ fontWeight: 900, color: 'white', fontSize: '1.5rem', textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}>{insight.title}</p>
             <p className="mt-1 text-sm text-gray-700">{insight.description}</p>
-          </li>
+          </motion.li>
         ))}
       </ul>
     </div>
