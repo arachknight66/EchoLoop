@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { motion, Variants } from "framer-motion";
 
 const features = [
   {

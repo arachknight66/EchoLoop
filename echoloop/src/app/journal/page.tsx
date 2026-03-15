@@ -1,5 +1,5 @@
 "use client";
-
+import { motion, Variants } from "framer-motion";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import JournalDrawingCanvas from "@/components/JournalDrawingCanvas";

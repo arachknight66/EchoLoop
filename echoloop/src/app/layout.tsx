@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import Header from "@/components/Header";
 import Navigation from "@/components/Navigation";
 import "@/styles/globals.css";
-
+import { motion, Variants } from "framer-motion";
 export default function RootLayout({
   children,
 }: {

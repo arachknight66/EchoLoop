@@ -1,6 +1,7 @@
 import SleepTracker from "@/components/SleepTracker";
 import SleepAnalysis from "@/components/SleepAnalysis";
 import SleepPersonas from "@/components/SleepPersonas";
+import { motion, Variants } from "framer-motion";
 
 export default function SleepPage() {
   return (

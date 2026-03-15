@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import Image from "next/image";
 import wearOsLogo from "./Wear_OS.svg";
 import { useSleep } from "@/hooks/useSleep";

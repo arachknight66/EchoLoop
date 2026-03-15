@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { motion,Variants } from "framer-motion";
+import { motion,Variants, Variants } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 
 type Message = {

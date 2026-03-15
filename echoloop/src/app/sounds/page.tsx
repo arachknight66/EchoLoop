@@ -1,5 +1,6 @@
 import SoundMixer from "@/components/SoundMixer";
 import MeditationTimer from "@/components/MeditationTimer";
+import { motion, Variants } from "framer-motion";
 
 export default function SoundsPage() {
   return (
