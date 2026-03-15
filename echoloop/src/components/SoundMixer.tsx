@@ -4,71 +4,81 @@ import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 
 type SoundControl = {
-  name: string;
+  id: string;
   label: string;
+  fileName: string; // Added to map exactly to the .mp3 file names
   volume: number;
   isPlaying: boolean;
 };
 
 const sounds: SoundControl[] = [
-  { name: "rain", label: "Rain", volume: 0, isPlaying: false },
-  { name: "ocean", label: "Ocean Waves", volume: 0, isPlaying: false },
-  { name: "forest", label: "Forest", volume: 0, isPlaying: false },
-  { name: "wind", label: "Wind", volume: 0, isPlaying: false },
-  { name: "fireplace", label: "Fireplace", volume: 0, isPlaying: false },
-  { name: "night", label: "Night Ambience", volume: 0, isPlaying: false },
+  { id: "rain", label: "Rain", fileName: "rain", volume: 0, isPlaying: false },
+  { id: "ocean", label: "Ocean Waves", fileName: "ocean_waves", volume: 0, isPlaying: false },
+  { id: "forest", label: "Forest", fileName: "forest", volume: 0, isPlaying: false },
+  { id: "wind", label: "Wind", fileName: "wind", volume: 0, isPlaying: false },
+  { id: "fireplace", label: "Fireplace", fileName: "fireplace", volume: 0, isPlaying: false },
+  { id: "night", label: "Night Ambience", fileName: "night_ambience", volume: 0, isPlaying: false },
 ];
 
 export default function SoundMixer() {
   const [controls, setControls] = useState<Record<string, number>>(
-    sounds.reduce((acc, sound) => ({ ...acc, [sound.name]: 0 }), {})
+    sounds.reduce((acc, sound) => ({ ...acc, [sound.id]: 0 }), {})
   );
   const [playing, setPlaying] = useState<Set<string>>(new Set());
   const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
 
   useEffect(() => {
     // Update audio volumes
-    Object.entries(controls).forEach(([soundName, volume]) => {
-      const audio = audioRefs.current[soundName];
+    Object.entries(controls).forEach(([soundId, volume]) => {
+      const audio = audioRefs.current[soundId];
       if (audio) {
         audio.volume = volume / 100;
       }
     });
   }, [controls]);
 
-  const handleVolumeChange = (soundName: string, value: number) => {
+  const handleVolumeChange = (soundId: string, value: number) => {
+    // 1. Update React state for the UI
     setControls((prev) => ({
       ...prev,
-      [soundName]: value,
+      [soundId]: value,
     }));
 
-    // Auto-play if slider is moved above 0
-    if (value > 0 && !playing.has(soundName)) {
-      toggleSound(soundName, true);
-    } else if (value === 0 && playing.has(soundName)) {
-      toggleSound(soundName, false);
+    // 2. Instantly update volume on the ref to prevent initial audio spikes 
+    const audio = audioRefs.current[soundId];
+    if (audio) {
+      audio.volume = value / 100;
+    }
+
+    // 3. Auto-play if slider is moved above 0
+    if (value > 0 && !playing.has(soundId)) {
+      toggleSound(soundId, true);
+    } else if (value === 0 && playing.has(soundId)) {
+      toggleSound(soundId, false);
     }
   };
 
-  const toggleSound = (soundName: string, shouldPlay: boolean) => {
-    const audio = audioRefs.current[soundName];
+  const toggleSound = (soundId: string, shouldPlay: boolean) => {
+    const audio = audioRefs.current[soundId];
     if (!audio) return;
 
-    if (shouldPlay && controls[soundName] > 0) {
-      audio.play().catch(() => {
-        // Audio playback failed, silently continue
+    // The buggy `&& controls[soundId] > 0` check was removed here
+    // because React state updates are asynchronous and would block playback
+    if (shouldPlay) {
+      audio.play().catch((err) => {
+        console.error(`Playback failed for ${soundId}:`, err);
       });
       setPlaying((prev) => {
         const newSet = new Set(prev);
-        newSet.add(soundName);
+        newSet.add(soundId);
         return newSet;
       });
     } else {
       audio.pause();
-      audio.currentTime = 0;
+      // Removed audio.currentTime = 0 to allow seamless resuming of ambient loops
       setPlaying((prev) => {
         const newSet = new Set(prev);
-        newSet.delete(soundName);
+        newSet.delete(soundId);
         return newSet;
       });
     }
@@ -78,18 +88,16 @@ export default function SoundMixer() {
     Object.values(audioRefs.current).forEach((audio) => {
       if (audio) {
         audio.pause();
-        audio.currentTime = 0;
       }
     });
     setPlaying(new Set());
     setControls(
-      sounds.reduce((acc, sound) => ({ ...acc, [sound.name]: 0 }), {})
+      sounds.reduce((acc, sound) => ({ ...acc, [sound.id]: 0 }), {})
     );
   };
 
   return (
     <div className="sound-mixer-container">
-      {/* Custom Mixer Section */}
       <motion.div
         className="mixer-section"
         initial={{ opacity: 0, y: 20 }}
@@ -116,7 +124,7 @@ export default function SoundMixer() {
         <div className="mixer-controls">
           {sounds.map((sound) => (
             <motion.div
-              key={sound.name}
+              key={sound.id}
               className="mixer-control-item"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -124,7 +132,7 @@ export default function SoundMixer() {
             >
               <div className="control-header">
                 <label className="sound-label">{sound.label}</label>
-                <span className="volume-display">{controls[sound.name]}%</span>
+                <span className="volume-display">{controls[sound.id]}%</span>
               </div>
 
               <div className="slider-wrapper">
@@ -132,20 +140,21 @@ export default function SoundMixer() {
                   type="range"
                   min="0"
                   max="100"
-                  value={controls[sound.name]}
+                  value={controls[sound.id]}
                   onChange={(e) =>
-                    handleVolumeChange(sound.name, Number(e.target.value))
+                    handleVolumeChange(sound.id, Number(e.target.value))
                   }
                   className="mixer-slider"
                 />
                 <div className="slider-background" />
               </div>
 
+              {/* Pointing to the public/sounds/ folder */}
               <audio
                 ref={(el) => {
-                  if (el) audioRefs.current[sound.name] = el;
+                  if (el) audioRefs.current[sound.id] = el;
                 }}
-                src={`/sounds/${sound.name}.mp3`}
+                src={`/sounds/${sound.fileName}.mp3`}
                 loop
               />
             </motion.div>
