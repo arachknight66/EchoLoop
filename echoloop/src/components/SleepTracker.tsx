@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
+import wearOsLogo from "./Wear_OS.svg";
 import { useSleep } from "@/hooks/useSleep";
 import { auth } from "@/lib/firebase";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
@@ -192,6 +194,17 @@ export default function SleepTracker() {
       </div>
 
       {errorMsg && <p className="text-red-500 text-sm mb-3">{errorMsg}</p>}
+
+      <div className="mb-4 flex justify-center">
+        <Image
+          src={wearOsLogo}
+          alt="Wear OS"
+          width={280}
+          height={400}
+          priority
+          className="opacity-80 hover:opacity-100 transition-opacity"
+        />
+      </div>
 
       <motion.button
         onClick={handleFetchSmartwatchData}

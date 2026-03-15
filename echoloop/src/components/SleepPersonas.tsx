@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   LineChart,
@@ -12,6 +11,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useSleep } from "@/hooks/useSleep";
+import SoundPlayer from "@/components/SoundPlayer";
 
 type SleepPersona = {
   id: string;
@@ -122,7 +122,6 @@ export default function SleepPersonas({
   analysis?: SleepTrackerAnalysis;
 }) {
   const { sleepData } = useSleep();
-  const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
 
   // Mock sleep data for testing/demo purposes
   const mockSleepData = [
@@ -175,8 +174,15 @@ export default function SleepPersonas({
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
+          whileHover={{ y: -8, boxShadow: "0 20px 40px -10px rgba(0, 0, 0, 0.2)" }}
         >
-          <div className="persona-badge">{currentPersona.icon}</div>
+          <motion.div 
+            className="persona-badge"
+            whileHover={{ scale: 1.2, rotate: 10 }}
+            transition={{ type: "spring", stiffness: 300, damping: 10 }}
+          >
+            {currentPersona.icon}
+          </motion.div>
           <h2 className="persona-display-title">Your Sleep Persona</h2>
           <h3 className="persona-name">{currentPersona.name}</h3>
           <p className="persona-description">{currentPersona.description}</p>
@@ -185,9 +191,14 @@ export default function SleepPersonas({
             <p className="characteristics-label">Your Characteristics:</p>
             <ul className="characteristics-items">
               {currentPersona.characteristics.map((char, idx) => (
-                <li key={idx} className="characteristic-item">
+                <motion.li 
+                  key={idx} 
+                  className="characteristic-item"
+                  whileHover={{ x: 4, color: "#3B82F6" }}
+                  transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                >
                   {char}
-                </li>
+                </motion.li>
               ))}
             </ul>
           </div>
@@ -263,7 +274,11 @@ export default function SleepPersonas({
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
-              <div className="stat-item">
+              <motion.div 
+                className="stat-item"
+                whileHover={{ scale: 1.08, y: -4 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              >
                 <span className="stat-label">Average Sleep</span>
                 <span className="stat-value">
                   {(
@@ -272,23 +287,35 @@ export default function SleepPersonas({
                   ).toFixed(1)}
                   h
                 </span>
-              </div>
-              <div className="stat-item">
+              </motion.div>
+              <motion.div 
+                className="stat-item"
+                whileHover={{ scale: 1.08, y: -4 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              >
                 <span className="stat-label">Total Entries</span>
                 <span className="stat-value">{displaySleepData.length}</span>
-              </div>
-              <div className="stat-item">
+              </motion.div>
+              <motion.div 
+                className="stat-item"
+                whileHover={{ scale: 1.08, y: -4 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              >
                 <span className="stat-label">Max Sleep</span>
                 <span className="stat-value">
                   {Math.max(...displaySleepData.map((e) => e.hours))}h
                 </span>
-              </div>
-              <div className="stat-item">
+              </motion.div>
+              <motion.div 
+                className="stat-item"
+                whileHover={{ scale: 1.08, y: -4 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              >
                 <span className="stat-label">Min Sleep</span>
                 <span className="stat-value">
                   {Math.min(...displaySleepData.map((e) => e.hours))}h
                 </span>
-              </div>
+              </motion.div>
             </motion.div>
           )}
         </motion.div>
@@ -311,80 +338,8 @@ export default function SleepPersonas({
         </motion.div>
       )}
 
-      
-      <motion.div
-        className="all-personas-section"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
-        <h2 className="mixer-section-title">Sleep Personas</h2>
-        <p className="mixer-section-subtitle">
-          Explore different sleep personality types
-        </p>
-
-        <div className="personas-grid">
-          {personas.map((persona) => (
-            <motion.button
-              key={persona.id}
-              className={`persona-card ${
-                currentPersona?.id === persona.id ? "current" : ""
-              } ${selectedPersona === persona.id ? "selected" : ""}`}
-              onClick={() =>
-                setSelectedPersona(
-                  selectedPersona === persona.id ? null : persona.id
-                )
-              }
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              <div className="persona-icon">{persona.icon}</div>
-              <h3 className="persona-card-name">{persona.name}</h3>
-              <p className="persona-card-description">{persona.description}</p>
-
-              {currentPersona?.id === persona.id && (
-                <motion.div
-                  className="current-badge"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  Your Persona
-                </motion.div>
-              )}
-            </motion.button>
-          ))}
-        </div>
-      </motion.div>
-
-      {selectedPersona && selectedPersona !== currentPersona?.id && (
-        <motion.div
-          className="selected-persona-detail"
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          transition={{ duration: 0.4 }}
-        >
-          {(() => {
-            const selected = personas.find((p) => p.id === selectedPersona);
-            return selected ? (
-              <div className="detail-content">
-                <h3 className="detail-title">{selected.name}</h3>
-                <p className="detail-description">{selected.description}</p>
-                <div className="detail-characteristics">
-                  {selected.characteristics.map((char, idx) => (
-                    <span key={idx} className="detail-characteristic">
-                      {char}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ) : null;
-          })()}
-        </motion.div>
-      )}
+      {/* Ambient Sound Mixes */}
+      <SoundPlayer />
     </div>
   );
 }
