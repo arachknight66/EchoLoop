@@ -1,6 +1,6 @@
 import SleepTracker from "@/components/SleepTracker";
 import SleepAnalysis from "@/components/SleepAnalysis";
-import SoundPlayer from "@/components/SoundPlayer";
+import SleepPersonas from "@/components/SleepPersonas";
 
 export default function SleepPage() {
   return (
@@ -20,7 +20,7 @@ export default function SleepPage() {
       </div>
 
       <div className="panel-card">
-        <SoundPlayer />
+        <SleepPersonas />
       </div>
     </section>
   );
