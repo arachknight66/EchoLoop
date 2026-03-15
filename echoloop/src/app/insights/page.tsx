@@ -1,5 +1,5 @@
 import InsightsPanel from "@/components/InsightsPanel";
-
+import { motion, Variants } from "framer-motion";
 export default function InsightsPage() {
   return (
     <section className="page-shell">
