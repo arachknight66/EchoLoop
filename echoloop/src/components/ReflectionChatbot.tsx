@@ -139,7 +139,7 @@ export default function ReflectionChatbot() {
       </div>
 
       {/* Input Area */}
-      <form onSubmit={handleSendMessage} className="mt-auto flex w-full items-center gap-4 pt-3">
+      <form onSubmit={handleSendMessage} style="mt-auto flex w-full items-center gap-4 pt-3">
         <motion.input
           whileFocus={{ scale: 1.01 }}
           whileHover={{ borderColor: "#60a5fa" }}
@@ -149,7 +149,7 @@ export default function ReflectionChatbot() {
           onChange={(e) => setInput(e.target.value)}
           placeholder="Type your reflection here..."
           // Replaced flex-grow with flex-1 to ensure it properly consumes remaining space
-          className="flex-1 min-w-0 h-11 px-4 py-2.5 text-sm border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400/50 bg-white text-gray-800 shadow-sm transition-all box-border"
+          style="flex-1 min-w-0 h-11 px-4 py-2.5 text-sm border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400/50 bg-white text-gray-800 shadow-sm transition-all box-border"
           disabled={isLoading}
         />
         <motion.button
@@ -160,7 +160,7 @@ export default function ReflectionChatbot() {
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
           // Ensure it has a matching box-border height. 
           // Note: Temporarily remove 'panel-button' to test if it's the culprit!
-          className="h-11 min-w-[112px] shrink-0 px-5 py-2.5 text-sm font-medium bg-blue-500 text-white rounded-full disabled:opacity-50 shadow-sm transition-all flex items-center justify-center box-border"
+          style="h-11 min-w-[112px] shrink-0 px-5 py-2.5 text-sm font-medium bg-blue-500 text-white rounded-full disabled:opacity-50 shadow-sm transition-all flex items-center justify-center box-border"
         >
           Send
         </motion.button>
