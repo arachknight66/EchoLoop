@@ -1,8 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 
-// import { useInsights } from "@/hooks/useInsights";
+//import { useInsights } from "@/hooks/useInsights";
 
 const previewInsights = [
   {
