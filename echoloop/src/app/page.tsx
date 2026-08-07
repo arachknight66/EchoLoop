@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { motion, Variants } from "framer-motion";
 
 const features = [
   {
@@ -41,32 +40,50 @@ const features = [
 
 export default function HomePage() {
   return (
-    <section className="page-shell home-shell">
-      <div className="page-hero home-hero">
-        <p className="page-kicker">Mindful toolkit</p>
-        <h1 className="page-title">
-          EchoLoop turns quiet daily rituals into a visual rhythm.
-        </h1>
-        <p className="page-copy">
-          Move between journaling, sketching, sleep cues, ambient calm, and
-          reflection without leaving the same warm space.
-        </p>
-      </div>
-
-      <div className="feature-grid">
-        {features.map((feature) => (
-          <Link
-            key={feature.href}
-            href={feature.href}
-            className={`feature-tile ${feature.className}`}
-          >
-            <p className="feature-tile__eyebrow">{feature.eyebrow}</p>
-            <h2 className="feature-tile__title">{feature.title}</h2>
-            <p className="feature-tile__copy">{feature.copy}</p>
-            <span className="feature-tile__cta">Open section</span>
+    <div className="landing-page">
+      <header className="landing-header">
+        <div className="landing-logo">◯ ECHOLOOP</div>
+        <nav className="landing-nav">
+          <Link href="/journal" className="launch-button">
+            Launch App
           </Link>
-        ))}
-      </div>
-    </section>
+        </nav>
+      </header>
+
+      <main className="landing-main">
+        <section className="landing-hero">
+          <p className="landing-kicker">Mindful toolkit</p>
+          <h1 className="landing-title">
+            EchoLoop turns quiet daily rituals into a visual rhythm.
+          </h1>
+          <p className="landing-copy">
+            Move between journaling, sketching, sleep cues, ambient calm, and
+            reflection without leaving the same warm space.
+          </p>
+          <div className="landing-actions">
+            <Link href="/journal" className="launch-button large">
+              Start Your Journey
+            </Link>
+          </div>
+        </section>
+
+        <section className="landing-features">
+          <div className="feature-grid">
+            {features.map((feature) => (
+              <Link
+                key={feature.href}
+                href={feature.href}
+                className={`feature-tile ${feature.className}`}
+              >
+                <p className="feature-tile__eyebrow">{feature.eyebrow}</p>
+                <h2 className="feature-tile__title">{feature.title}</h2>
+                <p className="feature-tile__copy">{feature.copy}</p>
+                <span className="feature-tile__cta">Open section</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      </main>
+    </div>
   );
 }

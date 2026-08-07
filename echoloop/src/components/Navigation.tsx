@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion, Variants } from "framer-motion";
 
 const links = [
@@ -32,6 +33,8 @@ const itemVariants: Variants = {
 };
 
 export default function Navigation() {
+  const pathname = usePathname();
+
   return (
     <nav className="app-nav">
       <motion.div
@@ -58,18 +61,33 @@ export default function Navigation() {
         initial="hidden"
         animate="visible"
       >
-        {links.map((link) => (
-          <motion.li key={link.href} variants={itemVariants}>
-            <Link href={link.href} className="app-nav__link">
-              <motion.span
-                whileHover={{ x: 4 }}
-                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+        {links.map((link) => {
+          const isActive = pathname === link.href;
+          return (
+            <motion.li key={link.href} variants={itemVariants}>
+              <Link
+                href={link.href}
+                className={`app-nav__link ${isActive ? 'active' : ''}`}
               >
-                {link.label}
-              </motion.span>
-            </Link>
-          </motion.li>
-        ))}
+                <motion.span
+                  whileHover={{ x: 4 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                >
+                  {link.label}
+                </motion.span>
+                {isActive && (
+                  <motion.div
+                    layoutId="active-nav-indicator"
+                    className="app-nav__active-indicator"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
+              </Link>
+            </motion.li>
+          );
+        })}
       </motion.ul>
     </nav>
   );
