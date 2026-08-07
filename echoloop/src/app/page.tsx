@@ -44,7 +44,7 @@ export default function HomePage() {
       <header className="landing-header">
         <div className="landing-logo">◯ ECHOLOOP</div>
         <nav className="landing-nav">
-          <Link href="/journal" className="launch-button">
+          <Link href="/onboarding" className="launch-button">
             Launch App
           </Link>
         </nav>
@@ -61,7 +61,7 @@ export default function HomePage() {
             reflection without leaving the same warm space.
           </p>
           <div className="landing-actions">
-            <Link href="/journal" className="launch-button large">
+            <Link href="/onboarding" className="launch-button large">
               Start Your Journey
             </Link>
           </div>

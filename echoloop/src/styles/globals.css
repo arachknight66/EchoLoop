@@ -2998,3 +2998,55 @@ textarea {
   background-color: #DCDBCE;
   border-radius: 0 4px 4px 0;
 }
+
+/* Onboarding Page Styles (Zen Style UI) */
+.onboarding-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  color: #DCDBCE;
+  text-align: center;
+  font-family: inherit;
+}
+
+.onboarding-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  max-width: 600px;
+  padding: 2rem;
+}
+
+.onboarding-title {
+  font-size: 2.5rem;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.onboarding-button {
+  padding: 1rem 3rem;
+  border: 1px solid rgba(220, 219, 206, 0.3);
+  border-radius: 999px;
+  background: transparent;
+  color: #DCDBCE;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.5s ease;
+}
+
+.onboarding-button:hover {
+  background: rgba(220, 219, 206, 0.1);
+  border-color: #DCDBCE;
+}
+
+.breathing-circle {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(220, 219, 206, 0.2) 0%, transparent 70%);
+  border: 1px solid rgba(220, 219, 206, 0.1);
+}
