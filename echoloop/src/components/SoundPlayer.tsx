@@ -163,7 +163,11 @@ export default function SoundPlayer() {
             </h3>
             <motion.button
               className="reset-mix-btn"
-              onClick={() => handleResetMix(selectedMix)}
+              onClick={() => {
+                if (selectedMix) {
+                  handleResetMix(selectedMix);
+                }
+              }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               title="Reset to defaults"
@@ -186,9 +190,11 @@ export default function SoundPlayer() {
                 min="0"
                 max="100"
                 value={selectedControls.volume}
-                onChange={(e) =>
-                  handleVolumeChange(selectedMix, Number(e.target.value))
-                }
+                onChange={(e) => {
+                  if (selectedMix) {
+                    handleVolumeChange(selectedMix, Number(e.target.value));
+                  }
+                }}
                 className="mix-slider"
               />
             </div>
@@ -206,9 +212,11 @@ export default function SoundPlayer() {
                 min="0"
                 max="100"
                 value={selectedControls.intensity}
-                onChange={(e) =>
-                  handleIntensityChange(selectedMix, Number(e.target.value))
-                }
+                onChange={(e) => {
+                  if (selectedMix) {
+                    handleIntensityChange(selectedMix, Number(e.target.value));
+                  }
+                }}
                 className="mix-slider"
               />
             </div>
